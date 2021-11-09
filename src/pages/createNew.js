@@ -1,6 +1,37 @@
 import React, { useRef, useState } from "react"
 import Header from "../components/Header"
 import Lolly from "../components/Lolly"
+import { gql, useMutation } from "@apollo/client"
+
+// const GET_DATA = gql`
+//   {
+//     hello
+//   }
+// `
+
+//mutation createlolly
+const createLollyMutation = gql`
+  mutation createLolly(
+    $recipientName: String!
+    $message: String!
+    $senderName: String!
+    $flavourTop: String!
+    $flavourMiddle: String!
+    $flavourBottom: String!
+  ) {
+    createLolly(
+      recipientName: $recipientName
+      message: $message
+      senderName: $senderName
+      flavourTop: $flavourTop
+      flavourMiddle: $flavourMiddle
+      flavourBottom: $flavourBottom
+    ) {
+      message
+      lollyPath
+    }
+  }
+`
 
 const CreateNew = () => {
   const [color1, setColor1] = useState("#d52358")
@@ -9,13 +40,31 @@ const CreateNew = () => {
   const receiptNameRef = useRef()
   const messageRef = useRef()
   const senderRef = useRef()
+  //const { data } = useQuery(GET_DATA)
+  const [createLolly] = useMutation(createLollyMutation)
 
-  const submitLollyForm = () => {
+  const submitLollyForm = async () => {
     console.log("clicked")
+    console.log("Color1 ", color1)
+    console.log("sender ", senderRef.current.value)
+
+    const result = await createLolly({
+      variables: {
+        recipientName: receiptNameRef.current.value,
+        message: messageRef.current.value,
+        senderName: senderRef.current.value,
+        flavourTop: color1,
+        flavourMiddle: color2,
+        flavourBottom: color3,
+      },
+    })
+    console.log("result from server", result)
   }
 
   return (
     <div className="container">
+      {/* {data && data.hello && <div>{data.hello}</div>} */}
+
       <Header />
       <div className="lollyFormDiv">
         <div>
